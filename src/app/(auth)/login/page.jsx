@@ -15,22 +15,29 @@ const LogInPage = () => {
 
   const emailValue = watch("email");
 
-  const [isShowPassword,setIsShowPassword] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false);
 
-  const handleLoginFunc =async (data) => {
+  const handleLoginFunc = async (data) => {
     // e.preventDefault();
     // const email = e.target.email.value
     // const password = e.target.password.value
     // console.log(email,password)
     console.log(data, "data");
-    
+
     const { data: res, error } = await authClient.signIn.email({
-    email: data.email, // required
-    password: data.password, // required
-    rememberMe: true,
-    callbackURL: "/",
-});
-console.log(res,error)
+      email: data.email, // required
+      password: data.password, // required
+      rememberMe: true,
+      callbackURL: "/",
+    });
+    console.log(res, error);
+
+    if (error) {
+      alert(error.message);
+    }
+    if (res) {
+      alert("Signin successfull");
+    }
   };
   //   console.log(watch('email') )
 
@@ -68,8 +75,11 @@ console.log(res,error)
                 },
               })}
             />
-            <span className="absolute top-4.5 right-2 cursor-pointer" onClick={() => setIsShowPassword(!isShowPassword)}>
-             {isShowPassword ? <FaEye/> : <FaEyeSlash/>}
+            <span
+              className="absolute top-4.5 right-2 cursor-pointer"
+              onClick={() => setIsShowPassword(!isShowPassword)}
+            >
+              {isShowPassword ? <FaEye /> : <FaEyeSlash />}
             </span>
             {errors.password && (
               <p className="text-red-500">{errors.password.message}</p>

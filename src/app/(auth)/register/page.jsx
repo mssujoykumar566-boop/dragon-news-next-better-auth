@@ -1,7 +1,9 @@
 "use client";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegisterPage = () => {
   const {
@@ -12,13 +14,33 @@ const RegisterPage = () => {
   } = useForm();
   const emailValue = watch("email");
 
-  const handleRegisterFunc = (data) => {
+   const [isShowPassword,setIsShowPassword] = useState(false);
+
+  const handleRegisterFunc = async (data) => {
     // e.preventDefault();
     // const email = e.target.email.value
     // const password = e.target.password.value
     // console.log(email,password)
-    console.log(data, "data");
-    const {name, photo,email, password} = data;
+    // console.log(data, "data");
+    const { name, photo, email, password } = data;
+    // console.log(name, photo,email, password);
+
+    const { data: res, error } = await authClient.signUp.email({
+      name: name, // required
+      email: email, // required
+      password: password, // required
+      image: photo,
+      callbackURL: "/",
+    });
+
+    // console.log(res,error)
+
+    if (error) {
+      alert(error.message);
+    }
+    if (res) {
+      alert("Regitration successfull");
+    }
   };
   //   console.log(watch('email') )
 
@@ -48,7 +70,9 @@ const RegisterPage = () => {
               type="text"
               className="input"
               placeholder="Enter your photo url"
-              {...register("photo", { required: "Photo URL field is required" })}
+              {...register("photo", {
+                required: "Photo URL field is required",
+              })}
             />
             {errors.photo && (
               <p className="text-red-500">{errors.photo.message}</p>
@@ -66,21 +90,30 @@ const RegisterPage = () => {
               <p className="text-red-500">{errors.email.message}</p>
             )}
           </fieldset>
-          <fieldset className="fieldset">
+          <fieldset className="fieldset relative">
             <legend className="fieldset-legend">Password</legend>
             <input
-              type="password"
+              type={isShowPassword ? "text" : "password"}
               className="input"
               placeholder="Enter your password"
-              {...register("password", { required: "Password field is required" })}
+              {...register("password", {
+                required: "Password field is required",
+              })}
             />
+            <span
+              className="absolute top-4.5 right-7 cursor-pointer"
+              onClick={() => setIsShowPassword(!isShowPassword)}
+            >
+              {isShowPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
             {errors.password && (
               <p className="text-red-500">{errors.password.message}</p>
             )}
-         
           </fieldset>
 
-          <button className="btn w-full bg-slate-800 text-white">Register</button>
+          <button className="btn w-full bg-slate-800 text-white">
+            Register
+          </button>
         </form>
 
         {/* <p className="mt-6 ">

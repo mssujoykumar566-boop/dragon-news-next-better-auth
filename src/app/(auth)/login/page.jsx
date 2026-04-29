@@ -1,7 +1,9 @@
 "use client";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LogInPage = () => {
   const {
@@ -10,14 +12,25 @@ const LogInPage = () => {
     watch,
     formState: { errors },
   } = useForm();
+
   const emailValue = watch("email");
 
-  const handleLoginFunc = (data) => {
+  const [isShowPassword,setIsShowPassword] = useState(false);
+
+  const handleLoginFunc =async (data) => {
     // e.preventDefault();
     // const email = e.target.email.value
     // const password = e.target.password.value
     // console.log(email,password)
     console.log(data, "data");
+    
+    const { data: res, error } = await authClient.signIn.email({
+    email: data.email, // required
+    password: data.password, // required
+    rememberMe: true,
+    callbackURL: "/",
+});
+console.log(res,error)
   };
   //   console.log(watch('email') )
 
@@ -41,10 +54,10 @@ const LogInPage = () => {
               <p className="text-red-500">{errors.email.message}</p>
             )}
           </fieldset>
-          <fieldset className="fieldset">
+          <fieldset className="fieldset relative">
             <legend className="fieldset-legend">Password</legend>
             <input
-              type="password"
+              type={isShowPassword ? "text" : "password"}
               className="input"
               placeholder="Enter your password"
               {...register("password", {
@@ -55,6 +68,9 @@ const LogInPage = () => {
                 },
               })}
             />
+            <span className="absolute top-4.5 right-2 cursor-pointer" onClick={() => setIsShowPassword(!isShowPassword)}>
+             {isShowPassword ? <FaEye/> : <FaEyeSlash/>}
+            </span>
             {errors.password && (
               <p className="text-red-500">{errors.password.message}</p>
             )}
